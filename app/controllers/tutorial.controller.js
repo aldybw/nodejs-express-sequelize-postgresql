@@ -1,5 +1,7 @@
 const db = require("../models");
 const Tutorial = db.tutorials;
+const Comment = db.comments;
+const Tag = db.tags;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Tutorial
@@ -7,7 +9,13 @@ exports.create = async (req, res) => {
   // Validate request
   if (!req.body.title) {
     res.status(400).send({
-      message: "Content can not be empty!",
+      message: "Title can not be empty!",
+    });
+    return;
+  }
+  if (!req.body.description) {
+    res.status(400).send({
+      message: "Description can not be empty!",
     });
     return;
   }
@@ -36,7 +44,23 @@ exports.findAll = async (req, res) => {
   var condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
 
   try {
-    const data = await Tutorial.findAll({ where: condition });
+    const data = await Tutorial.findAll({
+      where: condition,
+      include: [
+        "comments",
+        {
+          model: Tag,
+          as: "tags",
+          attributes: ["id", "name"],
+          through: {
+            attributes: [],
+          },
+          // through: {
+          //   attributes: ["tag_id", "tutorial_id"],
+          // },
+        },
+      ],
+    });
     res.send(data);
   } catch (err) {
     res.status(500).send({
@@ -50,7 +74,22 @@ exports.findOne = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const data = await Tutorial.findByPk(id);
+    const data = await Tutorial.findByPk(id, {
+      include: [
+        "comments",
+        {
+          model: Tag,
+          as: "tags",
+          attributes: ["id", "name"],
+          through: {
+            attributes: [],
+          },
+          // through: {
+          //   attributes: ["tag_id", "tutorial_id"],
+          // },
+        },
+      ],
+    });
 
     if (data) {
       res.send(data);
@@ -134,7 +173,10 @@ exports.deleteAll = async (req, res) => {
 // Find all published Tutorials
 exports.findAllPublished = async (req, res) => {
   try {
-    const data = await Tutorial.findAll({ where: { published: true } });
+    const data = await Tutorial.findAll({
+      where: { published: true },
+      include: ["comments"],
+    });
     res.send(data);
   } catch (err) {
     res.status(500).send({
