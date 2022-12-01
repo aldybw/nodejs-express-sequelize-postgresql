@@ -1,8 +1,8 @@
 const db = require("../models");
-const Tutorial = db.tutorials;
-const Comment = db.comments;
-const Tag = db.tags;
-const Op = db.Sequelize.Op;
+const Tutorial = db.tutorial;
+const Comment = db.comment;
+const Tag = db.tag;
+const Op = db.Op;
 
 exports.create = async (req, res) => {
   // Validate request
@@ -25,16 +25,16 @@ exports.create = async (req, res) => {
     return;
   }
 
-  const tutorial = await Tutorial.findByPk(comment.tutorialId);
-  if (!tutorial) {
-    return res.status(404).send({ message: "Tutorial was not found" });
-  }
-
   const comment = {
     name: req.body.name,
     text: req.body.text,
     tutorialId: req.body.tutorialId,
   };
+
+  const tutorial = await Tutorial.findByPk(comment.tutorialId);
+  if (!tutorial) {
+    return res.status(404).send({ message: "Tutorial was not found" });
+  }
 
   try {
     const data = await Comment.create(comment);

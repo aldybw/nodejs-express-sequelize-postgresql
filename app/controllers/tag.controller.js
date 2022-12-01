@@ -1,6 +1,6 @@
 const db = require("../models");
-const Tutorial = db.tutorials;
-const Tag = db.tags;
+const Tutorial = db.tutorial;
+const Tag = db.tag;
 
 exports.create = async (req, res) => {
   if (!req.body.text) {
@@ -101,7 +101,7 @@ exports.addTutorial = async (req, res) => {
       }
     }
 
-    tag.addTutorial(tutorial);
+    await tag.addTutorial(tutorial);
     res.send(`Added Tutorial id=${tutorial.id} to Tag id=${tag.id}`);
   } catch (err) {
     res.status(500).send({

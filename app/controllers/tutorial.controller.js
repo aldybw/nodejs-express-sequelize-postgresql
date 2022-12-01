@@ -1,8 +1,7 @@
 const db = require("../models");
-const Tutorial = db.tutorials;
-const Comment = db.comments;
-const Tag = db.tags;
-const Op = db.Sequelize.Op;
+const Tutorial = db.tutorial;
+const Tag = db.tag;
+const Op = db.Op;
 
 // Create and Save a new Tutorial
 exports.create = async (req, res) => {

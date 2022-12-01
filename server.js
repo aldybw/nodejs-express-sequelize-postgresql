@@ -4,19 +4,22 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("./app/models");
 
+// set port
+const PORT = process.env.PORT || 8080;
+
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:8080",
+  origin: `http://localhost:${PORT}`,
 };
 
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
-app.use(express.json());
+app.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", (req, res) => {
@@ -27,8 +30,6 @@ require("./app/routes/tutorial.routes")(app);
 require("./app/routes/comment.routes")(app);
 require("./app/routes/tag.routes")(app);
 
-// set port
-const PORT = process.env.PORT || 8080;
 app.listen(PORT, async () => {
   try {
     // testing the connection
@@ -46,3 +47,20 @@ app.listen(PORT, async () => {
     console.error("Unable to connect to the database:", error);
   }
 });
+
+function initial() {
+  Role.create({
+    id: 1,
+    name: "user",
+  });
+
+  Role.create({
+    id: 2,
+    name: "moderator",
+  });
+
+  Role.create({
+    id: 3,
+    name: "admin",
+  });
+}

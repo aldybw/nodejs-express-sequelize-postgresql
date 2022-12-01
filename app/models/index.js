@@ -1,9 +1,9 @@
 const dbConfig = require("../config/db.config.js");
 
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes, Op } = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
-  dialect: dbConfig.dialect,
+  dialect: dbConfig.DIALECT,
   operatorsAliases: false,
 
   pool: {
@@ -16,26 +16,44 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 
 const db = {};
 
-db.Sequelize = DataTypes;
+db.DataTypes = DataTypes;
 db.sequelize = sequelize;
+db.Op = Op;
 
-db.tutorials = require("./tutorial.model.js")(sequelize, DataTypes);
-db.comments = require("./comment.model.js")(sequelize, DataTypes);
-db.tags = require("./tag.model.js")(sequelize, Sequelize);
+db.user = require("../models/user.model.js")(sequelize, Sequelize);
+db.role = require("../models/role.model.js")(sequelize, Sequelize);
+db.tutorial = require("./tutorial.model.js")(sequelize, DataTypes);
+db.comment = require("./comment.model.js")(sequelize, DataTypes);
+db.tag = require("./tag.model.js")(sequelize, DataTypes);
 
-db.tutorials.hasMany(db.comments, { as: "comments" });
-db.comments.belongsTo(db.tutorials, {
+// many-to-many relationship between users and roles
+db.role.belongsToMany(db.user, {
+  through: "user_roles",
+  foreignKey: "roleId",
+  otherKey: "userId",
+});
+db.user.belongsToMany(db.role, {
+  through: "user_roles",
+  foreignKey: "userId",
+  otherKey: "roleId",
+});
+db.ROLES = ["user", "admin", "moderator"];
+
+// one-to-many relationship between tutorial and comments
+db.tutorial.hasMany(db.comment, { as: "comments" });
+db.comment.belongsTo(db.tutorial, {
   foreignKey: "tutorialId",
   as: "tutorial",
 });
 
-db.tags.belongsToMany(db.tutorials, {
-  through: "tutorial_tag",
+// many-to-many relationship between tutorials and tags
+db.tag.belongsToMany(db.tutorial, {
+  through: "tutorial_tags",
   as: "tutorials",
   foreignKey: "tag_id",
 });
-db.tutorials.belongsToMany(db.tags, {
-  through: "tutorial_tag",
+db.tutorial.belongsToMany(db.tag, {
+  through: "tutorial_tags",
   as: "tags",
   foreignKey: "tutorial_id",
 });
