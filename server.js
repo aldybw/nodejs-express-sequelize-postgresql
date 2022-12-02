@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("./app/models");
+const Role = db.role;
 
 // set port
 const PORT = process.env.PORT || 8080;
@@ -29,6 +30,8 @@ app.get("/", (req, res) => {
 require("./app/routes/tutorial.routes")(app);
 require("./app/routes/comment.routes")(app);
 require("./app/routes/tag.routes")(app);
+require("./app/routes/auth.routes")(app);
+require("./app/routes/user.routes")(app);
 
 app.listen(PORT, async () => {
   try {
@@ -43,24 +46,30 @@ app.listen(PORT, async () => {
     console.log(
       `Server is running on port ${PORT}, access this on http://localhost:${PORT}`
     );
+
+    initial();
   } catch (error) {
     console.error("Unable to connect to the database:", error);
   }
 });
 
-function initial() {
-  Role.create({
-    id: 1,
-    name: "user",
+async function initial() {
+  await Role.findOrCreate({
+    where: { name: "user" },
+    defaults: {
+      name: "user",
+    },
   });
-
-  Role.create({
-    id: 2,
-    name: "moderator",
+  await Role.findOrCreate({
+    where: { name: "moderator" },
+    defaults: {
+      name: "moderator",
+    },
   });
-
-  Role.create({
-    id: 3,
-    name: "admin",
+  await Role.findOrCreate({
+    where: { name: "admin" },
+    defaults: {
+      name: "admin",
+    },
   });
 }
