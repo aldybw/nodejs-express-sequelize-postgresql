@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 8080;
 
 const app = express();
 
+global.__basedir = __dirname;
+
 var corsOptions = {
   origin: `http://localhost:${PORT}`,
 };
@@ -32,6 +34,7 @@ require("./app/routes/comment.routes")(app);
 require("./app/routes/tag.routes")(app);
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
+require("./app/routes/upload.routes")(app);
 
 app.listen(PORT, async () => {
   try {
