@@ -7,7 +7,7 @@ let routes = (app) => {
   router.get("/files", files.getListFiles);
   router.get("/files/:name", files.download);
 
-  app.use(router);
+  app.use("/api", router);
 };
 
 module.exports = routes;
