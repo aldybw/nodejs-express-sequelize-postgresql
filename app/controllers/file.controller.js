@@ -1,4 +1,5 @@
 const uploadFile = require("../middleware/upload");
+const fs = require("fs");
 
 const upload = async (req, res) => {
   try {
@@ -19,7 +20,7 @@ const upload = async (req, res) => {
     }
 
     res.status(500).send({
-      message: `Could not upload the file: ${req.file.originalname}. ${err}`,
+      message: `Could not upload the file: ${req.file}. ${err}`,
     });
   }
 };
@@ -39,7 +40,8 @@ const getListFiles = (req, res) => {
     files.forEach((file) => {
       fileInfos.push({
         name: file,
-        url: baseUrl + file,
+        url: file,
+        // url: baseUrl + file,
       });
     });
 
